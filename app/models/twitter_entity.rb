@@ -1,4 +1,4 @@
 class TwitterEntity < ApplicationRecord
-  has_many :followers
-  has_many :users, through: :followers
+  has_many :followings
+  has_many :users, through: :followings
 end

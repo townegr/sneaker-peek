@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  has_many :followers
-  has_many :twitter_entities, through: :followers
+  has_many :followings
+  has_many :twitter_entities, through: :followings
 
   def self.find_or_create_from_auth_hash(auth_hash)
     user = where(provider: auth_hash.provider, uid: auth_hash.uid).first_or_create
