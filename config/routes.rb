@@ -1,3 +1,7 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  get '/auth/:provider/callback', to: 'sessions#create'
+
+  resources :twitter_entities
+
+  root to: "twitter_entities#index"
 end
