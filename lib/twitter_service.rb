@@ -2,14 +2,12 @@ class TwitterService
   attr_reader :user
 
   def self.call(user)
-    new(user).call()
+    new(user).call
   end
 
   def initialize(user)
     @user = user
   end
-
-  private
 
   def call
     @client ||= Twitter::REST::Client.new do |config|

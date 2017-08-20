@@ -24,5 +24,7 @@ module SneakerPeek
         ENV[key.to_s] = value
       end if File.exists?(env_file)
     end
+
+    config.eager_load_paths << "#{Rails.root}/lib"
   end
 end
