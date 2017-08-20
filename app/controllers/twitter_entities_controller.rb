@@ -1,5 +1,6 @@
 class TwitterEntitiesController < ApplicationController
   def index
+    @entities = current_user.twitter_entities
   end
 
   def new
