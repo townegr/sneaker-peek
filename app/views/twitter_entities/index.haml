@@ -3,8 +3,10 @@
 - @twitter_entities.each do |twitter_entity|
   %ul
     %li
-      = link_to twitter_entity.name, ''
+      = link_to "@#{twitter_entity.name}", twitter_entity_path(twitter_entity.id)
       %br
       = "Tweet Count: #{twitter_entity.tweet_count}"
       %br
       = "Follower Count: #{twitter_entity.follower_count}"
+
+= button_to 'New', new_twitter_entity_path, method: :get

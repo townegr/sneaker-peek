@@ -1,0 +1,9 @@
+%h1= "@#{@twitter_entity.name} Data"
+= button_to 'Back', twitter_entities_path, method: :get
+
+- @tweets.each do |count, msg|
+  %ul
+    %li
+      = msg
+      %br
+      = "Likes: #{count}"

@@ -18,14 +18,14 @@ class SneakerPeekService
   private
 
   def payload
-    match.to_json
+    twitter_entity.to_json
   end
 
   def connection
     @conn ||= begin
-                conn = Bunny.new(ENV["CLOUDAMQP_URL"].presence)
-                conn.start
-              end
+      conn = Bunny.new(ENV["CLOUDAMQP_URL"].presence)
+      conn.start
+    end
   end
 
   def channel

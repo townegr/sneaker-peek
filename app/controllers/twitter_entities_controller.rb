@@ -1,6 +1,9 @@
 class TwitterEntitiesController < ApplicationController
+  before_action :set_twitter_entity, only: [:edit, :show, :update, :destroy]
+  before_action :twitter_service, only: [:index, :create, :show]
+
   def index
-    @twitter_entities = current_user.twitter_entities.order(:name)
+    @twitter_entities = find_or_update_twitter_entities @twitter_service
   end
 
   def new
@@ -8,8 +11,7 @@ class TwitterEntitiesController < ApplicationController
   end
 
   def create
-    service = TwitterService.(current_user)
-    twitter_user = service.fetch twitter_entity_params[:name]
+    twitter_user = @twitter_service.fetch twitter_entity_params[:name]
 
     respond_to do |format|
       if create_twitter_entity twitter_user
@@ -20,6 +22,11 @@ class TwitterEntitiesController < ApplicationController
     end
   end
 
+  def show
+    client = @twitter_service.client
+    @tweets = @twitter_entity.get_tweets_with_likes client
+  end
+
   def update
   end
 
@@ -28,11 +35,19 @@ class TwitterEntitiesController < ApplicationController
 
   private
 
+  def set_twitter_entity
+    @twitter_entity = TwitterEntity.find_by_id params[:id]
+  end
+
+  def twitter_service
+    @twitter_service = TwitterService.(current_user)
+  end
+
   def twitter_entity_params
     params.require(:twitter_entity).permit(:name)
   end
 
-  def create_twitter_entity(user)
+  def create_twitter_entity(twitter_user)
     TwitterEntity.transaction do
       twitter_entity = TwitterEntity.find_or_create_by!(
         name: user.screen_name,
@@ -43,5 +58,20 @@ class TwitterEntitiesController < ApplicationController
     end
   rescue ActiveRecord::RecordInvalid => exception
     raise exception, (_("Unable to create Twitter Entity: %s") % exception.message), exception.backtrace
+  end
+
+  def find_or_update_twitter_entities(service)
+    twitter_entities = current_user.twitter_entities.order(:name)
+    twitter_entities.tap { |entities|
+      entities.each do |entity|
+        user = service.fetch entity.name
+        new_params = {
+          tweet_count: user.tweets_count,
+          follower_count: user.followers_count
+        }
+        entity.assign_attributes new_params
+        entity.save! if entity.changed?
+      end
+    }
   end
 end
