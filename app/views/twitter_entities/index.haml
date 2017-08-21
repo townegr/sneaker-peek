@@ -2,4 +2,9 @@
 
 - @twitter_entities.each do |twitter_entity|
   %ul
-    %li= link_to twitter_entity.name, ''
+    %li
+      = link_to twitter_entity.name, ''
+      %br
+      = "Tweet Count: #{twitter_entity.tweet_count}"
+      %br
+      = "Follower Count: #{twitter_entity.follower_count}"

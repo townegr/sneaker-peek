@@ -40,11 +40,14 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
+    amq-protocol (2.2.0)
     arel (7.1.4)
     awesome_print (1.8.0)
     bindex (0.5.0)
     buftok (0.2.0)
     builder (3.2.3)
+    bunny (2.7.0)
+      amq-protocol (>= 2.2.0)
     byebug (9.0.6)
     coderay (1.1.1)
     coffee-rails (4.2.2)
@@ -262,6 +265,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print
+  bunny (~> 2.7)
   byebug
   coffee-rails (~> 4.2)
   haml-rails (~> 1.0)

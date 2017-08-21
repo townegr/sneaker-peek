@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170820081224) do
+ActiveRecord::Schema.define(version: 20170821003838) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20170820081224) do
     t.integer  "follower_count", default: 0, null: false
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.index ["name", "uid"], name: "index_twitter_entities_on_name_and_uid", unique: true, using: :btree
   end
 
   create_table "users", force: :cascade do |t|

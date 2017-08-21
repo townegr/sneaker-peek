@@ -11,10 +11,12 @@ class TwitterEntitiesController < ApplicationController
     service = TwitterService.(current_user)
     twitter_user = service.fetch twitter_entity_params[:name]
 
-    if create_twitter_entity twitter_user
-      redirect_to twitter_entities_path
-    else
-      redirect_to new_twitter_entity_path
+    respond_to do |format|
+      if create_twitter_entity twitter_user
+        format.html { redirect_to twitter_entities_path, notice: 'Successfully created!' }
+      else
+        format.html { redirect_to new_twitter_entity_path }
+      end
     end
   end
 
