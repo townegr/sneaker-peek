@@ -3,7 +3,16 @@ class TwitterEntitiesController < ApplicationController
   before_action :twitter_service, only: [:index, :create, :show]
 
   def index
-    @twitter_entities = find_or_update_twitter_entities @twitter_service
+    respond_to do |format|
+      if @twitter_entities = TwitterEntity.find_or_update_twitter_entities current_user, @twitter_service
+        SneakerPeekService.new(@twitter_object = TwitterEntity.create_hierarchy_for_json(current_user, @twitter_service)).publish!
+        format.html
+        format.json { render :index, status: :ok, location: @twitter_object }
+      else
+        format.html { render :index }
+        format.json { render json: @twitter_entities.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def new
@@ -23,8 +32,7 @@ class TwitterEntitiesController < ApplicationController
   end
 
   def show
-    client = @twitter_service.client
-    @tweets = @twitter_entity.get_tweets_with_likes client
+    @tweets = @twitter_entity.get_tweets_with_likes @twitter_service
   end
 
   def update
@@ -40,7 +48,7 @@ class TwitterEntitiesController < ApplicationController
   end
 
   def twitter_service
-    @twitter_service = TwitterService.(current_user)
+    @twitter_service ||= TwitterService.(current_user)
   end
 
   def twitter_entity_params
@@ -57,21 +65,6 @@ class TwitterEntitiesController < ApplicationController
       current_user.followings.find_or_create_by! twitter_entity: twitter_entity
     end
   rescue ActiveRecord::RecordInvalid => exception
-    raise exception, (_("Unable to create Twitter Entity: %s") % exception.message), exception.backtrace
-  end
-
-  def find_or_update_twitter_entities(service)
-    twitter_entities = current_user.twitter_entities.order(:name)
-    twitter_entities.tap { |entities|
-      entities.each do |entity|
-        user = service.fetch entity.name
-        new_params = {
-          tweet_count: user.tweets_count,
-          follower_count: user.followers_count
-        }
-        entity.assign_attributes new_params
-        entity.save! if entity.changed?
-      end
-    }
+    raise exception, ("Unable to create Twitter Entity: %s" % exception.message), exception.backtrace
   end
 end

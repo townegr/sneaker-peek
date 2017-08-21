@@ -17,7 +17,8 @@ class TwitterService
     client.access_token_secret = user.secret
   end
 
-  def fetch(name)
-    client.user name
+  # returns Twitter::User object
+  def fetch(user_name)
+    client.user user_name
   end
 end

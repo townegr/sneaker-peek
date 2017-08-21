@@ -1,16 +1,16 @@
 require 'bunny'
 
 class SneakerPeekService
-  attr_reader :twitter_entity
+  attr_reader :twitter_object
 
-  def initialize(twitter_entity_id)
-    @twitter_entity = TwitterEntity.find_by_id twitter_entity_id
+  def initialize(twitter_object)
+    @twitter_object = twitter_object
   end
 
-  def publish
-    return if twitter_entity.nil?
+  def publish!
+    return if twitter_object.nil?
 
-    exchange = channel.direct("twitter_entity_analytics")
+    exchange = channel.direct("twitter_object_components")
     exchange.publish(payload, routing_key: queue.name, persistent: true)
     connection.close
   end
@@ -18,7 +18,7 @@ class SneakerPeekService
   private
 
   def payload
-    twitter_entity.to_json
+    twitter_object.to_json
   end
 
   def connection
@@ -33,6 +33,6 @@ class SneakerPeekService
   end
 
   def queue
-    @queue ||= channel.queue("twitter_entity-#{twitter_entity.id}", durable: true)
+    @queue ||= channel.queue("twitter-object-#{twitter_object.keys.first}", durable: true)
   end
 end
