@@ -1,6 +1,6 @@
-%h1= "@#{@twitter_entity.name} Data"
 = button_to 'Back', twitter_entities_path, method: :get
 
+%h2= "@#{@twitter_entity.name} Tweets"
 - @tweets.each do |count, msg|
   %ul
     %li

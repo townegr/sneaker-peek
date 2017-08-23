@@ -1,1 +1,1 @@
-json.tweets @tweets
+json.tweets @entity

@@ -4,10 +4,10 @@ class TwitterEntitiesController < ApplicationController
 
   def index
     respond_to do |format|
-      if @twitter_entities = TwitterEntity.find_or_update_twitter_entities current_user, @twitter_service
-        SneakerPeekService.new(@twitter_object = TwitterEntity.create_hierarchy_for_json(current_user, @twitter_service)).publish!
+      if @twitter_entities = TwitterEntity.find_or_update_twitter_entities(current_user, @twitter_service)
+        SneakerPeekService.new(@entities = TwitterEntity.fetch_data_for_followings(current_user, @twitter_service)).publish!
         format.html
-        format.json { render :index, status: :ok, location: @twitter_object }
+        format.json { render :index, status: :ok, entities: @entities }
       else
         format.html { render :index }
         format.json { render json: @twitter_entities.errors, status: :unprocessable_entity }
@@ -32,19 +32,34 @@ class TwitterEntitiesController < ApplicationController
   end
 
   def show
-    @tweets = @twitter_entity.get_tweets_with_likes @twitter_service
+    respond_to do |format|
+      if @tweets = @twitter_entity.get_tweets_with_likes(@twitter_service)
+        SneakerPeekService.new(@entity = @twitter_entity.fetch_data_for_entity(current_user, @twitter_service)).publish!
+        format.html
+        format.json { render :show, status: :ok, entity: @entity }
+      else
+        format.html { render :index }
+        format.json { render json: @tweets.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def update
   end
 
   def destroy
+    if @twitter_entity.destroy
+      respond_to do |format|
+        format.html { redirect_to twitter_entities_path, notice: 'Deleted account' }
+      end
+    end
   end
 
   private
 
   def set_twitter_entity
-    @twitter_entity = TwitterEntity.find_by_id params[:id]
+    query = params[:service] == 'frontend' ? { uid: params[:id] } : { id: params[:id] }
+    @twitter_entity = TwitterEntity.find_by query
   end
 
   def twitter_service
@@ -58,9 +73,9 @@ class TwitterEntitiesController < ApplicationController
   def create_twitter_entity(twitter_user)
     TwitterEntity.transaction do
       twitter_entity = TwitterEntity.find_or_create_by!(
-        name: user.screen_name,
-        uid: user.id,
-        profile_image: user.profile_image_uri.to_str
+        name: twitter_user.screen_name,
+        uid: twitter_user.id,
+        profile_image: twitter_user.profile_image_uri.to_str
       )
       current_user.followings.find_or_create_by! twitter_entity: twitter_entity
     end

@@ -10,8 +10,8 @@ class SneakerPeekService
   def publish!
     return if twitter_object.nil?
 
-    exchange = channel.direct("twitter_object_components")
-    exchange.publish(payload, routing_key: queue.name, persistent: true)
+    exchange = channel.direct 'twitter_object_components'
+    exchange.publish payload, routing_key: queue.name, persistent: true
     connection.close
   end
 
@@ -22,17 +22,17 @@ class SneakerPeekService
   end
 
   def connection
-    @conn ||= begin
-      conn = Bunny.new(ENV["CLOUDAMQP_URL"].presence)
+    @_conn ||= begin
+      conn = Bunny.new ENV["CLOUDAMQP_URL"].presence
       conn.start
     end
   end
 
   def channel
-    @channel ||= connection.create_channel
+    @_channel ||= connection.create_channel
   end
 
   def queue
-    @queue ||= channel.queue("twitter-object-#{twitter_object.keys.first}", durable: true)
+    @_queue ||= channel.queue "twitter-object-#{twitter_object.keys.first}", durable: true
   end
 end

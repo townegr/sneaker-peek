@@ -1,1 +1,1 @@
-json.twitter_entities TwitterEntity.create_hierarchy_for_json(current_user, @twitter_service)
+json.all_followings @entities

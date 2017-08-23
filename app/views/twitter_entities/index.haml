@@ -1,12 +1,17 @@
-%h1= "SneakerPeek Homepage"
+%h1 SneakerPeek Admin
 
-- @twitter_entities.each do |twitter_entity|
-  %ul
-    %li
-      = link_to "@#{twitter_entity.name}", twitter_entity_path(twitter_entity.id)
-      %br
-      = "Tweet Count: #{twitter_entity.tweet_count}"
-      %br
-      = "Follower Count: #{twitter_entity.follower_count}"
+%table{style: "border-spacing: 10px;"}
+  %thead
+    %th Account
+    %th Total Likes
+    %th Total Followers
+    %td
+  - @twitter_entities.each do |entity|
+    %tbody
+      %tr
+        %td= link_to "@#{entity.name}", twitter_entity_path(entity.id)
+        %td= entity.tweet_count
+        %td= entity.follower_count
+        %td= button_to 'Delete', twitter_entity_path(entity.id), method: :delete
 
 = button_to 'New', new_twitter_entity_path, method: :get
