@@ -1,4 +1,5 @@
 class TwitterEntitiesController < ApplicationController
+  before_action :reset_session, unless: :signed_in?
   before_action :set_twitter_entity, only: [:edit, :show, :update, :destroy]
   before_action :twitter_service, only: [:index, :create, :show]
 
